@@ -5,7 +5,6 @@
 
 #pragma once
 
-
 class CMineDoc : public CDocument
 {
 protected: // 仅从序列化创建
@@ -20,6 +19,13 @@ public:
 
 	UINT m_numX;
 	UINT m_numY;
+
+	UINT m_ticks;
+	UINT m_maxTicks;
+	UINT m_timerId;
+	UINT m_leftMines;
+
+	MyMine m_mines[100][100];
 // 操作
 public:
    void DrawTimer(CDC* pDC);

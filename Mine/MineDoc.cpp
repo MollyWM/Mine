@@ -35,6 +35,21 @@ CMineDoc::CMineDoc()
 	this->m_index = 2;
 
 	this->m_numX = this->m_numY = 9;
+
+	this->m_ticks = 0;
+	this->m_maxTicks = 999;
+	this->m_timerId = 9999;
+	this->m_leftMines = 10;
+
+	for (UINT y = 0; y < this->m_numY; y++)
+	{
+		for (UINT x = 0; x < this->m_numX; x++)
+		{	
+			this->m_mines[x][y].m_width = 16;
+			this->m_mines[x][y].m_height = 16;
+			this->m_mines[x][y].m_status = MineStatus::Normal;
+		}
+	}
 }
 
 CMineDoc::~CMineDoc()

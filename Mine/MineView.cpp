@@ -88,13 +88,32 @@ void CMineView::DrawStatusArea(CDC* memoryDC, CMineDoc* pDoc)
 	numbersBitmap.LoadBitmapW(IDB_NUMBERS);
 	tempDC.SelectObject(numbersBitmap);
 
-	memoryDC->StretchBlt(0, 0, 16, 23, &tempDC, 0, pDoc->m_index * 23, 16, 23, SRCCOPY);
+	UINT num = pDoc->m_ticks;
+
+	if (pDoc->m_ticks > pDoc->m_maxTicks)
+	{
+		num = pDoc->m_maxTicks; 
+	}
+
+	UINT num1 = num / 100;
+	UINT num2 = num / 10 - num1;
+	UINT num3 = num - num1 * 100 - num2 * 10;
+
+	memoryDC->StretchBlt(0, 0, 16, 23, &tempDC, 0, (11 - num1) * 23, 16, 23, SRCCOPY);
+	memoryDC->StretchBlt(16, 0, 16, 23, &tempDC, 0, (11 - num2) * 23, 16, 23, SRCCOPY);
+	memoryDC->StretchBlt(32, 0, 16, 23, &tempDC, 0, (11 - num3) * 23, 16, 23, SRCCOPY);
+
+	num1 = pDoc->m_leftMines / 10;
+	num2 = pDoc->m_leftMines - num1 * 10;
+
+	memoryDC->StretchBlt(76, 0, 16, 23, &tempDC, 0, (11 - num1) * 23, 16, 23, SRCCOPY);
+	memoryDC->StretchBlt(92, 0, 16, 23, &tempDC, 0, (11 - num2) * 23, 16, 23, SRCCOPY);
 
 	CBitmap facesBitmap;
 	facesBitmap.LoadBitmapW(IDB_FACES);
 	tempDC.SelectObject(facesBitmap);
 
-	memoryDC->StretchBlt(20, 0, 24, 24, &tempDC, 0, 0, 24, 24, SRCCOPY);
+	memoryDC->StretchBlt(50, 0, 24, 24, &tempDC, 0, 24 * 4, 24, 24, SRCCOPY);
 }
 
 void CMineView::DrawMineArea(CDC* memoryDC, CMineDoc* pDoc)
@@ -109,7 +128,8 @@ void CMineView::DrawMineArea(CDC* memoryDC, CMineDoc* pDoc)
 	{
 		for (UINT x = 0; x < pDoc->m_numX; x++)
 		{
-			memoryDC->StretchBlt(x * 16, 100 + y * 16, 16, 16, &tempDC, 0, 0, 16, 16, SRCCOPY);
+			MyMine mine = pDoc->m_mines[x][y];
+			memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_width * mine.m_status, 16, 16, SRCCOPY);
 		}
 	}
 }
@@ -117,7 +137,6 @@ void CMineView::DrawMineArea(CDC* memoryDC, CMineDoc* pDoc)
 
 
 // CMineView 诊断
-
 #ifdef _DEBUG
 void CMineView::AssertValid() const
 {
@@ -140,14 +159,12 @@ CMineDoc* CMineView::GetDocument() const // 非调试版本是内联的
 // CMineView 消息处理程序
 void CMineView::OnTimer(UINT nIDEvent)
 {
-	if (1 == nIDEvent)
+	CMineDoc* pDoc = this->GetDocument();
+
+	if (pDoc->m_timerId == nIDEvent)
 	{
 		CMineDoc* pDoc = GetDocument();
-		pDoc->m_index++;
-		if (pDoc->m_index >= pDoc->m_max)
-		{
-			pDoc->m_index = 2;
-		}
+		pDoc->m_ticks++;
 
 		InvalidateRect(NULL);
 	}
@@ -155,12 +172,32 @@ void CMineView::OnTimer(UINT nIDEvent)
 
 void CMineView::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	SetTimer(1, 1000, NULL);
+	CMineDoc* pDoc = this->GetDocument();
+	CRect faceRect(50, 0, 74, 24);
+	CRect mineAreaRect(0, 30, pDoc->m_numX * 16, pDoc->m_numY * 16 + 30);
+
+	if (faceRect.PtInRect(point))
+	{
+		SetTimer(pDoc->m_timerId, 1000, NULL);
+	}
+
+	InvalidateRect(NULL);
 }
 
 void CMineView::OnRButtonUp(UINT nFlags, CPoint point)
 {
-	KillTimer(1);
+	CMineDoc* pDoc = this->GetDocument();
+	CRect mineAreaRect(0, 30, pDoc->m_numX * 16, pDoc->m_numY * 16 + 30);
+
+	if (mineAreaRect.PtInRect(point))
+	{
+		UINT x = point.x / 16;
+		UINT y = (point.y - 30) / 16;
+
+		pDoc->m_mines[x][y].ChangeStatus();
+	}
+
+	InvalidateRect(NULL);
 }
 
 BOOL CMineView::OnEraseBkgnd(CDC* pDC)
