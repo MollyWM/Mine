@@ -97,7 +97,7 @@ IDR_MAINFRAME MENU
 BEGIN
     POPUP "文件(&F)"
     BEGIN
-        MENUITEM "新建(&N)\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "开始(&N)\tCtrl+N",                ID_FILE_NEW
     END
     POPUP "帮助(&H)"
     BEGIN

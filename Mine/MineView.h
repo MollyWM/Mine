@@ -25,6 +25,7 @@ public:
 	virtual void OnDraw(CDC* pDC);  // 重写以绘制该视图
 	virtual BOOL PreCreateWindow(CREATESTRUCT& cs);
 protected:
+    virtual void SetWindowSize();
 
 // 实现
 public:
@@ -43,6 +44,7 @@ protected:
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 	afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+    afx_msg void OnStart();
 	DECLARE_MESSAGE_MAP()
 };
 

@@ -45,7 +45,11 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	// TODO: 在此处通过修改
 
 	//  CREATESTRUCT cs 来修改窗口类或样式
-	cs.style = WS_MINIMIZEBOX | WS_MAXIMIZE | WS_SYSMENU;
+
+    cs.cx = 300;
+    cs.cy = 300;
+	cs.style = WS_SYSMENU;
+
 	return TRUE;
 }
 
@@ -62,7 +66,3 @@ void CMainFrame::Dump(CDumpContext& dc) const
 	CFrameWnd::Dump(dc);
 }
 #endif //_DEBUG
-
-
-// CMainFrame 消息处理程序
-
