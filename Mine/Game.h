@@ -18,6 +18,14 @@ public:
     void SetHardLevel();
     void SetCustomLevel(UINT numberOfMines, UINT numberOfBlockInX, UINT numberOfBlockInY);
 
+
+	MyMine _mines[100][100];
+    UINT _elapsedTime;
+    UINT _numberOfMines;
+    UINT _numberOfBlockInX;
+    UINT _numberOfBlockInY;
+    BOOL _started;
+
 protected: 
     void SetLevel(UINT numberOfMines, UINT numberOfBlockInX, UINT numberOfBlockInY);
     BOOL IsInMineArea(UINT x, UINT y);
@@ -27,10 +35,5 @@ protected:
     UINT GetAroundFlags(UINT row, UINT col);
 
 private:
-    MyMine _mines[100][100];
-    UINT _elapsedTime;
-    UINT _numberOfMines;
-    UINT _numberOfBlockInX;
-    UINT _numberOfBlockInY;
-    BOOL _started;
+    
 };

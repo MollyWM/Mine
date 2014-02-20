@@ -20,3 +20,7 @@
 #define _APS_NEXT_COMMAND_VALUE		32771
 #endif
 #endif
+
+#define ID_GAME_EASY 140
+#define ID_GAME_MEDIUM 142
+#define ID_GAME_HARD 144

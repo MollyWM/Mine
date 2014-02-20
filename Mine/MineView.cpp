@@ -26,7 +26,9 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
         ON_WM_LBUTTONUP()
         ON_WM_RBUTTONUP()
         ON_WM_ERASEBKGND()
-        ON_COMMAND(ID_FILE_NEW, OnStart)
+        ON_COMMAND(ID_GAME_EASY, OnEasy)
+		ON_COMMAND(ID_GAME_MEDIUM, OnMedium)
+		ON_COMMAND(ID_GAME_HARD, OnHard)
     END_MESSAGE_MAP()
 
     // CMineView 构造/析构
@@ -60,11 +62,8 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
 
         // TODO: 在此处为本机数据添加绘制代码
         //pDoc->DrawTimer(pDC);
-
-        if (!pDoc->m_setWindowSize)
-        {
-            this->SetWindowSize();
-        }
+		
+		this->SetWindowSize();
 
         CRect clientRect;
         GetClientRect(&clientRect);
@@ -92,32 +91,33 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
         numbersBitmap.LoadBitmapW(IDB_NUMBERS);
         tempDC.SelectObject(numbersBitmap);
 
-        UINT num = pDoc->m_ticks;
+		Game* pGame = &(pDoc->_game);
 
-        if (pDoc->m_ticks > pDoc->m_maxTicks)
-        {
-            num = pDoc->m_maxTicks; 
-        }
+		UINT num = pGame->_elapsedTime;
+
 
         UINT num1 = num / 100;
         UINT num2 = num / 10 - num1 * 10;
         UINT num3 = num - num1 * 100 - num2 * 10;
 
+		CRect clientRect;
+        GetClientRect(&clientRect);
+
         memoryDC->StretchBlt(0, 0, 16, 23, &tempDC, 0, (11 - num1) * 23, 16, 23, SRCCOPY);
         memoryDC->StretchBlt(16, 0, 16, 23, &tempDC, 0, (11 - num2) * 23, 16, 23, SRCCOPY);
         memoryDC->StretchBlt(32, 0, 16, 23, &tempDC, 0, (11 - num3) * 23, 16, 23, SRCCOPY);
 
-        if (pDoc->m_leftMines >= 0)
+		if (pGame->_numberOfMines >= 0)
         {
-            num1 = pDoc->m_leftMines / 10;
-            num2 = pDoc->m_leftMines - num1 * 10;
+            num1 = pGame->_numberOfMines / 10;
+            num2 = pGame->_numberOfMines - num1 * 10;
 
             memoryDC->StretchBlt(76, 0, 16, 23, &tempDC, 0, (11 - num1) * 23, 16, 23, SRCCOPY);
             memoryDC->StretchBlt(92, 0, 16, 23, &tempDC, 0, (11 - num2) * 23, 16, 23, SRCCOPY);
         }
         else
         {
-            INT absLeftMines = abs((int)pDoc->m_leftMines);
+            INT absLeftMines = abs((int)pGame->_numberOfMines);
             num1 = absLeftMines / 10;
             num2 = absLeftMines - num1 * 10;
 
@@ -130,7 +130,7 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
         facesBitmap.LoadBitmapW(IDB_FACES);
         tempDC.SelectObject(facesBitmap);
 
-        memoryDC->StretchBlt(50, 0, 24, 24, &tempDC, 0, 24 * (pDoc->m_start ? 0 : 4), 24, 24, SRCCOPY);
+		memoryDC->StretchBlt(50, 0, 24, 24, &tempDC, 0, 24 * (pGame->_started ? 0 : 4), 24, 24, SRCCOPY);
     }
 
     void CMineView::DrawMineArea(CDC* memoryDC, CMineDoc* pDoc)
@@ -141,11 +141,13 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
         mineBitmap.LoadBitmapW(IDB_MINES);
         tempDC.SelectObject(mineBitmap);
 
-        for (UINT y = 0; y < pDoc->m_numY; y++)
+		Game* pGame = &(this->GetDocument()->_game);
+
+		for (UINT y = 0; y < pGame->_numberOfBlockInY; y++)
         {
-            for (UINT x = 0; x < pDoc->m_numX; x++)
+			for (UINT x = 0; x < pGame->_numberOfBlockInX; x++)
             {
-                MyMine mine = pDoc->m_mines[x][y];
+                MyMine mine = pGame->_mines[x][y];
                 memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_width * mine.m_status, 16, 16, SRCCOPY);
             }
         }
@@ -175,19 +177,8 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
     void CMineView::OnTimer(UINT nIDEvent)
     {
         CMineDoc* pDoc = this->GetDocument();
-
-        if (!pDoc->m_start)
-        {
-            return;
-        }
-
-        if (pDoc->m_timerId == nIDEvent)
-        {
-            CMineDoc* pDoc = GetDocument();
-            pDoc->m_ticks++;
-
-            InvalidateRect(NULL);
-        }
+		pDoc->_game.Elapse();
+		InvalidateRect(NULL);
     }
 
     void CMineView::OnLButtonUp(UINT nFlags, CPoint point)
@@ -195,19 +186,21 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
         this->SetWindowSize();
 
         CMineDoc* pDoc = this->GetDocument();
-        CRect faceRect(50, 0, 74, 24);
-        CRect mineAreaRect(0, 30, pDoc->m_numX * 16, pDoc->m_numY * 16 + 30);
+		Game* pGame = &(pDoc->_game);
 
-        if (faceRect.PtInRect(point) && !pDoc->m_start)
+        CRect faceRect(50, 0, 74, 24);
+        CRect mineAreaRect(0, 30, pGame->_numberOfBlockInX * 16, pGame->_numberOfBlockInY * 16 + 30);
+
+        if (faceRect.PtInRect(point) && !pGame->_started)
         {
-            pDoc->Start(this);
+			this->Start();;
             InvalidateRect(NULL);
             return;
         }
 
         if (mineAreaRect.PtInRect(point))
-        {
-            if (!pDoc->m_start)
+        {	 
+            if (!pGame->_started)
             {
                 return;
             }
@@ -215,56 +208,46 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
             UINT x = point.x / 16;
             UINT y = (point.y - 30) / 16;
 
-            MyMine* mine = &(pDoc->m_mines[x][y]);
+			pGame->LeftClickInMineArea(x, y);
 
-            if (mine->m_status != MineStatus::Flag)
-            {
-                if (mine->m_isMine)
-                {
-                    mine->m_status = MineStatus::Bomb;
-                    pDoc->Failed();
-                    MessageBox(L"你挂了");
-                }
-                else
-                {
-                    pDoc->ExpandMines(x, y);
-                }
-            }
+			if (pGame->Fail(x, y))
+			{
+				MessageBox(L"你挂了");
+			}
+			else if (pGame->Success())
+			{
+				MessageBox(L"你赢了了");
+			}
+
+			if (!pGame->_started)
+			{
+				KillTimer(1);
+			}
         }
 
         InvalidateRect(NULL);
-
-        pDoc->CheckWin();
     }
 
     void CMineView::OnRButtonUp(UINT nFlags, CPoint point)
     {
         CMineDoc* pDoc = this->GetDocument();
 
-        if (!pDoc->m_start)
+		Game* pGame = &(pDoc->_game);
+
+        if (!pGame->_started)
         {
             return;
         }
 
-        CRect mineAreaRect(0, 30, pDoc->m_numX * 16, pDoc->m_numY * 16 + 30);
+		CRect mineAreaRect(0, 30, pGame->_numberOfBlockInX * 16, pGame->_numberOfBlockInY * 16 + 30);
 
         if (mineAreaRect.PtInRect(point))
         {
             UINT x = point.x / 16;
             UINT y = (point.y - 30) / 16;
 
-            MyMine* mine = &(pDoc->m_mines[x][y]);
+			pGame->RightClickInMineArea(x, y);
 
-            if (mine->m_status == MineStatus::Normal)
-            {
-                pDoc->m_leftMines--;
-            }
-            else if (mine->m_status == MineStatus::Flag)
-            {
-                pDoc->m_leftMines++;
-            }
-
-            mine->ChangeStatus();
         }
 
         InvalidateRect(NULL);
@@ -278,6 +261,7 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
     void CMineView::SetWindowSize()
     {
         CMineDoc* pDoc = this->GetDocument();
+		Game* pGame = &(pDoc->_game);
         CWnd* pFrame = this->GetTopLevelFrame();
 
         CRect clientRect;
@@ -289,14 +273,39 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
         ClientToScreen(&clientRect);
 
         UINT border = (clientRect.left - windowRect.left);
-        UINT width = border * 2 + pDoc->m_mines[0][0].m_width * pDoc->m_numX;
-        UINT height = clientRect.top - windowRect.top + pDoc->m_mines[0][0].m_height * pDoc->m_numY + 40;
+		UINT width = border * 2 + pGame->_mines[0][0].m_width * pGame->_numberOfBlockInX;
+		UINT height = clientRect.top - windowRect.top + pGame->_mines[0][0].m_height * pGame->_numberOfBlockInY + 40;
 
         this->GetTopLevelFrame()->SetWindowPos(&wndTopMost, windowRect.left, windowRect.top, width, height, SWP_NOZORDER | SWP_NOMOVE | SWP_NOCOPYBITS);
     }
 
-    void CMineView::OnStart()
+
+	void CMineView::Start()
     {
-        GetDocument()->Start(this);
+		Game* pGame = &(this->GetDocument()->_game);
+		pGame->Init();	
+		pGame->Start();
+		this->SetTimer(1, 1000, NULL);
         InvalidateRect(NULL);
+    }
+
+	void CMineView::OnEasy()
+    {
+		Game* pGame = &(this->GetDocument()->_game);
+		pGame->SetEasyLevel();
+		this->Start();
+    }
+
+	void CMineView::OnMedium()
+    {
+		Game* pGame = &(this->GetDocument()->_game);
+		pGame->SetMediumLevel();
+		this->Start();
+    }
+
+	void CMineView::OnHard()
+    {
+		Game* pGame = &(this->GetDocument()->_game);
+		pGame->SetHardLevel();
+		this->Start();
     }

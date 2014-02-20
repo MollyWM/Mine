@@ -13,22 +13,9 @@ protected: // 仅从序列化创建
 
     // 特性
 public:
-    UINT m_increase;
-    UINT m_max;
-    UINT m_index;
-
-    UINT m_numX;
-    UINT m_numY;
-
-    UINT m_ticks;
-    UINT m_maxTicks;
-    UINT m_timerId;
-    INT m_leftMines;
-
-    BOOL m_setWindowSize;
-    BOOL m_start;
-
     MyMine m_mines[100][100];
+
+	Game _game;
     // 操作
 public:
     void DrawTimer(CDC* pDC);

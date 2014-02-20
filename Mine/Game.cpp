@@ -12,7 +12,7 @@ void Game::SetMediumLevel()
 
 void Game::SetHardLevel()
 {
-    this->SetLevel(99, 16, 30);
+    this->SetLevel(99, 30, 16);
 }
 
 void Game::SetCustomLevel(UINT numberOfMines, UINT numberOfBlockInX, UINT numberOfBlockInY)
@@ -35,8 +35,8 @@ UINT Game::Elapse()
 
 BOOL Game::Init()
 {
-    this->SetEasyLevel();
     this->_elapsedTime = 0;
+	this->_started = FALSE;
 
     for (UINT y = 0; y < this->_numberOfBlockInY; y++)
     {
@@ -61,12 +61,7 @@ BOOL Game::Start()
 {
     this->LayMines(this->_numberOfBlockInX, this->_numberOfBlockInY);
     this->_started = TRUE;
-    return FALSE;
-}
-
-BOOL Game::ReStart()
-{
-    return FALSE;
+    return TRUE;
 }
 
 BOOL Game::Fail(UINT x, UINT y)
@@ -76,14 +71,20 @@ BOOL Game::Fail(UINT x, UINT y)
         return FALSE;
     }
 
-    return this->_mines[x][y].m_isMine;
+	if (this->_mines[x][y].m_isMine)
+	{
+		this->_started = FALSE;
+		return TRUE;
+	}
+    
+	return FALSE;
 }
 
 BOOL Game::Success()
 {
     for (UINT i = 0; i < this->_numberOfBlockInY; i++)
     {
-        for (UINT j = 0; j < this->_numberOfBlockInY; j++) 
+        for (UINT j = 0; j < this->_numberOfBlockInX; j++) 
         {
             MyMine* mine = &(this->_mines[i][j]);
 
@@ -93,7 +94,7 @@ BOOL Game::Success()
             }
         }
     }
-
+	this->_started = FALSE;
     return TRUE;
 }
 
@@ -104,6 +105,11 @@ BOOL Game::IsInMineArea(UINT x, UINT y)
 
 BOOL Game::LeftClickInMineArea(UINT x, UINT y)
 {
+	if (!this->_started)
+	{
+		return FALSE;
+	}
+
     if (!this->IsInMineArea(x, y))
     {
         return FALSE;
@@ -128,12 +134,29 @@ BOOL Game::LeftClickInMineArea(UINT x, UINT y)
 
 BOOL Game::RightClickInMineArea(UINT x, UINT y)
 {
+	if (!this->_started)
+	{
+		return FALSE;
+	}
+
     if (!this->IsInMineArea(x, y))
     {
         return FALSE;
     }
 
-    this->_mines[x][y].ChangeStatus();
+	MyMine* pMine = &(this->_mines[x][y]);
+
+	this->_mines[x][y].ChangeStatus();
+
+	if (pMine->m_status == MineStatus::Flag)
+	{
+		this->_numberOfMines--;
+	}
+	else if (pMine->m_status == MineStatus::Unknown)
+	{
+		this->_numberOfMines++;
+	}
+
     return TRUE;
 }
 
