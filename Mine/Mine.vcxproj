@@ -101,6 +101,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Mine.h" />
     <ClInclude Include="MineDoc.h" />
@@ -111,6 +112,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="Mine.cpp" />
     <ClCompile Include="MineDoc.cpp" />
