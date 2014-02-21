@@ -1,5 +1,9 @@
 #include "stdafx.h"
 
+Game::Game()
+{
+}
+
 void Game::SetEasyLevel()
 {
     this->SetLevel(10, 9, 9);
@@ -36,7 +40,8 @@ UINT Game::Elapse()
 BOOL Game::Init()
 {
     this->_elapsedTime = 0;
-	this->_started = FALSE;
+    this->_started = FALSE;
+    this->_failed = FALSE;
 
     for (UINT y = 0; y < this->_numberOfBlockInY; y++)
     {
@@ -66,18 +71,21 @@ BOOL Game::Start()
 
 BOOL Game::Fail(UINT x, UINT y)
 {
-    if (!IsInMineArea(x, y))
+    if (!this->LeftClickInMineArea(x, y))
     {
         return FALSE;
     }
 
-	if (this->_mines[x][y].m_isMine)
-	{
-		this->_started = FALSE;
-		return TRUE;
-	}
-    
-	return FALSE;
+    MyMine* mine = &(this->_mines[x][y]);
+
+    if (mine->m_isMine)
+    {
+        this->_started = FALSE;
+        this->_failed = TRUE;
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 BOOL Game::Success()
@@ -94,7 +102,7 @@ BOOL Game::Success()
             }
         }
     }
-	this->_started = FALSE;
+    this->_started = FALSE;
     return TRUE;
 }
 
@@ -105,10 +113,10 @@ BOOL Game::IsInMineArea(UINT x, UINT y)
 
 BOOL Game::LeftClickInMineArea(UINT x, UINT y)
 {
-	if (!this->_started)
-	{
-		return FALSE;
-	}
+    if (!this->_started)
+    {
+        return FALSE;
+    }
 
     if (!this->IsInMineArea(x, y))
     {
@@ -117,16 +125,18 @@ BOOL Game::LeftClickInMineArea(UINT x, UINT y)
 
     MyMine* mine = &(this->_mines[x][y]);
 
-    if (mine->m_status != MineStatus::Flag)
+    if (mine->m_status == MineStatus::Flag)
     {
-        if (mine->m_isMine)
-        {
-            mine->m_status = MineStatus::Bomb;
-        }
-        else
-        {
-            this->ExpandMines(x, y);
-        }
+        return FALSE;
+    }
+
+    if (mine->m_isMine)
+    {
+        mine->m_status = MineStatus::Bomb;
+    }
+    else
+    {
+        this->ExpandMines(x, y);
     }
 
     return TRUE;
@@ -134,28 +144,28 @@ BOOL Game::LeftClickInMineArea(UINT x, UINT y)
 
 BOOL Game::RightClickInMineArea(UINT x, UINT y)
 {
-	if (!this->_started)
-	{
-		return FALSE;
-	}
+    if (!this->_started)
+    {
+        return FALSE;
+    }
 
     if (!this->IsInMineArea(x, y))
     {
         return FALSE;
     }
 
-	MyMine* pMine = &(this->_mines[x][y]);
+    MyMine* pMine = &(this->_mines[x][y]);
 
-	this->_mines[x][y].ChangeStatus();
+    this->_mines[x][y].ChangeStatus();
 
-	if (pMine->m_status == MineStatus::Flag)
-	{
-		this->_numberOfMines--;
-	}
-	else if (pMine->m_status == MineStatus::Unknown)
-	{
-		this->_numberOfMines++;
-	}
+    if (pMine->m_status == MineStatus::Flag)
+    {
+        this->_numberOfMines--;
+    }
+    else if (pMine->m_status == MineStatus::Unknown)
+    {
+        this->_numberOfMines++;
+    }
 
     return TRUE;
 }
@@ -255,4 +265,39 @@ UINT Game::GetAroundFlags(UINT row, UINT col)
         }
     }
     return flags;
+}
+
+UINT Game::GetElapsedTime()
+{
+    return this->_elapsedTime;
+}
+
+UINT Game::GetNumberOfMines()
+{
+    return this->_numberOfMines;
+}
+
+UINT Game::GetNumberOfBlockInX()
+{
+    return this->_numberOfBlockInX;
+}
+
+UINT Game::GetNumberOfBlockInY()
+{
+    return this->_numberOfBlockInY;
+}
+
+BOOL Game::GetStarted()
+{
+    return this->_started;
+}
+
+MyMine& Game::GetMine(UINT x, UINT y)
+{
+    return this->_mines[x][y];
+}
+
+BOOL Game::GetFailed()
+{
+    return this->_failed;
 }

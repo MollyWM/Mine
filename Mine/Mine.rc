@@ -136,7 +136,7 @@
 	FONT 9, "MS Shell Dlg"
 	BEGIN
 	ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
-	LTEXT           "Mine，1.0 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+	LTEXT           "Mine，1.0 Kufa88版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
 	LTEXT           "Copyright (C) 2014",IDC_STATIC,42,26,114,8
 	DEFPUSHBUTTON   "确定",IDOK,113,41,50,14,WS_GROUP
 	END
@@ -165,13 +165,13 @@
 	BEGIN
 	BLOCK "080404B0"
 	BEGIN
-	VALUE "CompanyName", "TODO: <公司名>"
+	VALUE "CompanyName", "TODO: <Kufa88>"
 	VALUE "FileDescription", "Mine"
 	VALUE "FileVersion",     "1.0.0.1"
 	VALUE "InternalName",    "Mine.exe"
-	VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
+	VALUE "LegalCopyright", "TODO: (C) <Kufa88>。保留所有权利。"
 	VALUE "OriginalFilename","Mine.exe"
-	VALUE "ProductName", "TODO: <产品名>"
+	VALUE "ProductName", "TODO: <扫雷>"
 	VALUE "ProductVersion",  "1.0.0.1"
 	END
 	END

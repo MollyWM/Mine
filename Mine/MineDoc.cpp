@@ -29,7 +29,7 @@ IMPLEMENT_DYNCREATE(CMineDoc, CDocument)
 
     CMineDoc::CMineDoc()
     {
-		this->_game.SetMediumLevel();
+        this->_game.SetEasyLevel();
 		this->_game.Init();
     }
 

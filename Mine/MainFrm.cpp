@@ -49,6 +49,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
     cs.cx = 300;
     cs.cy = 300;
 	cs.style = WS_SYSMENU;
+    cs.lpszName = L"É¨À×";
 
 	return TRUE;
 }
