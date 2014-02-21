@@ -95,7 +95,6 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
 
         UINT num = pGame->GetElapsedTime();
 
-
         UINT num1 = num / 100;
         UINT num2 = num / 10 - num1 * 10;
         UINT num3 = num - num1 * 100 - num2 * 10;
@@ -311,7 +310,7 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
     void CMineView::Start()
     {
         Game* pGame = &(this->GetDocument()->_game);
-        pGame->Init();	
+        pGame->Init();
         pGame->Start();
         this->SetTimer(1, 1000, NULL);
         InvalidateRect(NULL);
@@ -336,4 +335,9 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
         Game* pGame = &(this->GetDocument()->_game);
         pGame->SetHardLevel();
         this->Start();
+    }
+
+    void GetStatusLeftSpan()
+    {
+
     }

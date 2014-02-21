@@ -80,6 +80,7 @@ BOOL Game::Fail(UINT x, UINT y)
 
     if (mine->m_isMine)
     {
+        mine->m_status = MineStatus::Error;
         this->_started = FALSE;
         this->_failed = TRUE;
         return TRUE;
@@ -215,7 +216,8 @@ void Game::ExpandMines(UINT row, UINT col)
         for (i = minRow; i < maxRow; i++) 
         {
             for (j = minCol; j < maxCol; j++) 
-            {//对于周围可以拓展的区域进行的规拓展		
+            {
+                //对于周围可以拓展的区域进行的规拓展		
                 MyMine* mine = &(this->_mines[i][j]);
                 if (!(i == row && j == col) && mine->m_status == MineStatus::Normal && !mine->m_isMine)
                 {
@@ -227,14 +229,14 @@ void Game::ExpandMines(UINT row, UINT col)
     }
 }
 
-UINT Game::GetAroundNum(UINT row, UINT col)
+UINT Game::GetAroundNum(UINT x, UINT y)
 {
     UINT i, j;
     UINT around = 0;
-    UINT minRow = (row == 0) ? 0 : row - 1;
-    UINT maxRow = row + 2;
-    UINT minCol = (col == 0) ? 0 : col - 1;
-    UINT maxCol = col + 2;
+    UINT minRow = (x == 0) ? 0 : x - 1;
+    UINT maxRow = x + 2;
+    UINT minCol = (y == 0) ? 0 : y - 1;
+    UINT maxCol = y + 2;
 
     for (i = minRow; i < maxRow; i++) 
     {
@@ -247,14 +249,14 @@ UINT Game::GetAroundNum(UINT row, UINT col)
     return around;
 }
 
-UINT Game::GetAroundFlags(UINT row, UINT col)
+UINT Game::GetAroundFlags(UINT x, UINT y)
 {
     UINT i, j;
     UINT flags = 0;
-    UINT minRow = (row == 0) ? 0 : row - 1;
-    UINT maxRow = row + 2;
-    UINT minCol = (col == 0) ? 0 : col - 1;
-    UINT maxCol = col + 2;
+    UINT minRow = (x == 0) ? 0 : x - 1;
+    UINT maxRow = x + 2;
+    UINT minCol = (y == 0) ? 0 : y - 1;
+    UINT maxCol = y + 2;
 
     for (i = minRow; i < maxRow; i++) 
     {
