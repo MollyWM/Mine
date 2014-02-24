@@ -29,6 +29,7 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
         ON_COMMAND(ID_GAME_EASY, OnEasy)
         ON_COMMAND(ID_GAME_MEDIUM, OnMedium)
         ON_COMMAND(ID_GAME_HARD, OnHard)
+        ON_COMMAND(ID_GAME_CUSTOM, OnCustom)
     END_MESSAGE_MAP()
 
     // CMineView 构造/析构
@@ -152,19 +153,19 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
                 {
                     if (mine.m_status == MineStatus::Normal && mine.m_isMine)
                     {
-                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * (UINT)MineStatus::Bomb, 16, 16, SRCCOPY);
+                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * MineStatus::Bomb, 16, 16, SRCCOPY);
                     }
                     else if (mine.m_status == MineStatus::Unknown && mine.m_isMine)
                     {
-                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * (UINT)MineStatus::Unknown, 16, 16, SRCCOPY);
+                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * MineStatus::Unknown, 16, 16, SRCCOPY);
                     }
                     else if (mine.m_status == MineStatus::Flag && mine.m_isMine)
                     {
-                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * (UINT)MineStatus::Mine, 16, 16, SRCCOPY);
+                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * MineStatus::Mine, 16, 16, SRCCOPY);
                     }
                     else if (mine.m_status == MineStatus::Flag && !mine.m_isMine)
                     {
-                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * (UINT)MineStatus::Error, 16, 16, SRCCOPY);
+                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * MineStatus::Error, 16, 16, SRCCOPY);
                     }
                     else
                     {
@@ -276,6 +277,13 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
 
             pGame->RightClickInMineArea(x, y);
 
+            if (pGame->Success())
+            {
+                KillTimer(1);
+                InvalidateRect(NULL);
+                MessageBox(L"你赢了", L"游戏结束", MB_OK);
+                return;
+            }
         }
 
         InvalidateRect(NULL);
@@ -337,7 +345,63 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
         this->Start();
     }
 
-    void GetStatusLeftSpan()
+    class CustomLevelDlg : public CDialogEx
     {
+    public:
+        CustomLevelDlg(CMineView* view);
+        UINT height;
+        UINT width;
+        UINT mines;
 
+        // 对话框数据
+        enum { IDD = IDD_CUSTOMLEVEL };
+    private:
+        CMineView* _view;
+
+    protected:
+        virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
+        virtual void OnOK();
+
+        // 实现
+    protected:
+        DECLARE_MESSAGE_MAP()
+    };
+
+    CustomLevelDlg::CustomLevelDlg(CMineView* view) : CDialogEx(CustomLevelDlg::IDD){
+        this->_view = view;
+        CMineDoc *doc = _view->GetDocument();
+        this->height = doc->_game.GetNumberOfBlockInX();
+        this->width = doc->_game.GetNumberOfBlockInY();
+        this->mines = doc->_game.GetNumberOfMines();
+        
+    }
+
+    void CustomLevelDlg::DoDataExchange(CDataExchange* pDX)
+    {
+        DDX_Text(pDX, IDC_HEIGHT, height);
+        DDX_Text(pDX, IDC_WIDTH, width);
+        DDX_Text(pDX, IDC_MINES, mines);
+
+        DDV_MinMaxInt(pDX, height, 9, 24);
+        DDV_MinMaxInt(pDX, width, 9, 30);
+        DDV_MinMaxInt(pDX, mines, 10, 668);
+
+        CDialogEx::DoDataExchange(pDX);
+    }
+
+    void CustomLevelDlg::OnOK()
+    {
+        CDialogEx::OnOK();
+        CMineDoc *doc = this->_view->GetDocument();
+        doc->_game.SetCustomLevel(mines, width, height);
+        this->_view->Start();
+    }
+
+    BEGIN_MESSAGE_MAP(CustomLevelDlg, CDialogEx)
+    END_MESSAGE_MAP()
+
+    void CMineView::OnCustom()
+    {
+        CustomLevelDlg dlg(this);
+        dlg.DoModal();
     }

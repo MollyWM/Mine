@@ -14,21 +14,8 @@ protected: // 仅从序列化创建
     // 特性
 public:
     MyMine m_mines[100][100];
+    Game _game;
 
-	Game _game;
-    // 操作
-public:
-    void DrawTimer(CDC* pDC);
-    void ExpandMines(UINT row, UINT col);
-    void InitMines();
-    void LayMines(UINT row, UINT col);
-    BOOL IsInMineArea(UINT row, UINT col);
-    BOOL CheckWin();
-    void Failed();
-    void Start(CWnd* wnd);
-private:
-    UINT GetAroundNum(UINT row, UINT col);
-    UINT GetAroundFlags(UINT row, UINT col);
     
     // 重写
 public:

@@ -130,11 +130,19 @@
     <None Include="res\Mine.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\Faces.bmp" />
     <Image Include="res\Mine.ico" />
     <Image Include="res\MineDoc.ico" />
+    <Image Include="res\Mines.bmp" />
+    <Image Include="res\Numbers.bmp" />
     <Image Include="res\Toolbar.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="Mine.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

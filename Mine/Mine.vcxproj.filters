@@ -89,5 +89,14 @@
     <Image Include="res\Toolbar.bmp">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\Numbers.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\Mines.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\Faces.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>

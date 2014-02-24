@@ -91,6 +91,11 @@ BOOL Game::Fail(UINT x, UINT y)
 
 BOOL Game::Success()
 {
+    if (this->_numberOfMines != 0)
+    {
+        return FALSE;
+    }
+
     for (UINT i = 0; i < this->_numberOfBlockInY; i++)
     {
         for (UINT j = 0; j < this->_numberOfBlockInX; j++) 

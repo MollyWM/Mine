@@ -30,6 +30,8 @@ protected:
     // й╣ож
 public:
     virtual ~CMineView();
+    void Start();
+
 #ifdef _DEBUG
     virtual void AssertValid() const;
     virtual void Dump(CDumpContext& dc) const;
@@ -38,7 +40,6 @@ public:
 protected:
     void DrawStatusArea(CDC* memoryDC, CMineDoc* pDoc);
     void DrawMineArea(CDC* memoryDC, CMineDoc* pDoc);
-    void Start();
     void Fail();
     void Succeed();
 
@@ -51,6 +52,7 @@ protected:
     afx_msg void OnEasy();
     afx_msg void OnMedium();
     afx_msg void OnHard();
+    afx_msg void OnCustom();
 
     DECLARE_MESSAGE_MAP()
 };
