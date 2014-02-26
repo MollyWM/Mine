@@ -81,6 +81,9 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
         this->DrawMineArea(&memoryDC, pDoc);
 
         pDC->BitBlt(0, 0, clientRect.Width(), clientRect.Height(), &memoryDC, 0, 0, SRCCOPY);
+
+        memoryBitmap.DeleteObject();
+        memoryDC.DeleteDC();
     }
 
     void CMineView::DrawStatusArea(CDC* memoryDC, CMineDoc* pDoc)
@@ -131,6 +134,10 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
         tempDC.SelectObject(facesBitmap);
 
         memoryDC->StretchBlt(50, 0, 24, 24, &tempDC, 0, 24 * (pGame->GetStarted() ? 0 : 4), 24, 24, SRCCOPY);
+
+        numbersBitmap.DeleteObject();
+        facesBitmap.DeleteObject();
+        tempDC.DeleteDC();
     }
 
     void CMineView::DrawMineArea(CDC* memoryDC, CMineDoc* pDoc)
@@ -151,21 +158,21 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
 
                 if (pGame->GetFailed())
                 {
-                    if (mine.m_status == MineStatus::Normal && mine.m_isMine)
+                    if (mine.m_status == MyMine::MineStatus::Normal && mine.m_isMine)
                     {
-                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * MineStatus::Bomb, 16, 16, SRCCOPY);
+                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * MyMine::MineStatus::Bomb, 16, 16, SRCCOPY);
                     }
-                    else if (mine.m_status == MineStatus::Unknown && mine.m_isMine)
+                    else if (mine.m_status == MyMine::MineStatus::Unknown && mine.m_isMine)
                     {
-                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * MineStatus::Unknown, 16, 16, SRCCOPY);
+                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * MyMine::MineStatus::Unknown, 16, 16, SRCCOPY);
                     }
-                    else if (mine.m_status == MineStatus::Flag && mine.m_isMine)
+                    else if (mine.m_status == MyMine::MineStatus::Flag && mine.m_isMine)
                     {
-                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * MineStatus::Mine, 16, 16, SRCCOPY);
+                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * MyMine::MineStatus::Mine, 16, 16, SRCCOPY);
                     }
-                    else if (mine.m_status == MineStatus::Flag && !mine.m_isMine)
+                    else if (mine.m_status == MyMine::MineStatus::Flag && !mine.m_isMine)
                     {
-                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * MineStatus::Error, 16, 16, SRCCOPY);
+                        memoryDC->StretchBlt(x * 16, 30 + y * 16, 16, 16, &tempDC, 0, mine.m_height * MyMine::MineStatus::Error, 16, 16, SRCCOPY);
                     }
                     else
                     {
@@ -178,6 +185,9 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
                 }
             }
         }
+
+        mineBitmap.DeleteObject();
+        tempDC.DeleteDC();
     }
 
     // CMineView Õï¶Ï
@@ -392,7 +402,15 @@ IMPLEMENT_DYNCREATE(CMineView, CView)
     void CustomLevelDlg::OnOK()
     {
         CDialogEx::OnOK();
+
+        if (mines >= width * height)
+        {
+            MessageBox(L"À×Ì«¶àÁË");
+            return;
+        }
+
         CMineDoc *doc = this->_view->GetDocument();
+
         doc->_game.SetCustomLevel(mines, width, height);
         this->_view->Start();
     }

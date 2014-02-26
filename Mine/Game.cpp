@@ -51,7 +51,7 @@ BOOL Game::Init()
 
             mine->m_width = 16;
             mine->m_height = 16;
-            mine->m_status = MineStatus::Normal;
+            mine->m_status = MyMine::MineStatus::Normal;
             mine->m_isMine = FALSE;
             mine->m_aroundMines = 0;
             mine->m_x = x;
@@ -80,7 +80,7 @@ BOOL Game::Fail(UINT x, UINT y)
 
     if (mine->m_isMine)
     {
-        mine->m_status = MineStatus::Error;
+        mine->m_status = MyMine::MineStatus::Error;
         this->_started = FALSE;
         this->_failed = TRUE;
         return TRUE;
@@ -102,7 +102,7 @@ BOOL Game::Success()
         {
             MyMine* mine = &(this->_mines[i][j]);
 
-            if (mine->m_status == MineStatus::Normal || mine->m_status == MineStatus::Unknown)
+            if (mine->m_status == MyMine::MineStatus::Normal || mine->m_status == MyMine::MineStatus::Unknown)
             {
                 return FALSE;
             }
@@ -131,14 +131,14 @@ BOOL Game::LeftClickInMineArea(UINT x, UINT y)
 
     MyMine* mine = &(this->_mines[x][y]);
 
-    if (mine->m_status == MineStatus::Flag)
+    if (mine->m_status == MyMine::MineStatus::Flag)
     {
         return FALSE;
     }
 
     if (mine->m_isMine)
     {
-        mine->m_status = MineStatus::Bomb;
+        mine->m_status = MyMine::MineStatus::Bomb;
     }
     else
     {
@@ -164,11 +164,11 @@ BOOL Game::RightClickInMineArea(UINT x, UINT y)
 
     this->_mines[x][y].ChangeStatus();
 
-    if (pMine->m_status == MineStatus::Flag)
+    if (pMine->m_status == MyMine::MineStatus::Flag)
     {
         this->_numberOfMines--;
     }
-    else if (pMine->m_status == MineStatus::Unknown)
+    else if (pMine->m_status == MyMine::MineStatus::Unknown)
     {
         this->_numberOfMines++;
     }
@@ -210,7 +210,7 @@ void Game::ExpandMines(UINT row, UINT col)
     UINT around = GetAroundNum(row, col);
 
 
-    this->_mines[row][col].m_status = (MineStatus)(15 - around);
+    this->_mines[row][col].m_status = (MyMine::MineStatus)(15 - around);
 
     // “打开”该区域，重绘
     //DrawSpecialMine(row, col);
@@ -224,7 +224,7 @@ void Game::ExpandMines(UINT row, UINT col)
             {
                 //对于周围可以拓展的区域进行的规拓展		
                 MyMine* mine = &(this->_mines[i][j]);
-                if (!(i == row && j == col) && mine->m_status == MineStatus::Normal && !mine->m_isMine)
+                if (!(i == row && j == col) && mine->m_status == MyMine::MineStatus::Normal && !mine->m_isMine)
                 {
                     if (!IsInMineArea(i, j)) continue;
                     ExpandMines(i, j);
@@ -268,7 +268,7 @@ UINT Game::GetAroundFlags(UINT x, UINT y)
         for (j = minCol; j < maxCol; j++)
         {
             if (!IsInMineArea(i, j)) continue;
-            if (this->_mines[i][j].m_status == MineStatus::Flag) flags++;
+            if (this->_mines[i][j].m_status == MyMine::MineStatus::Flag) flags++;
         }
     }
     return flags;

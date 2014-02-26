@@ -1,6 +1,11 @@
 #include "stdafx.h"
 
-enum MineStatus
+class MyMine
+{
+    
+public:
+
+    enum MineStatus
     {
         Normal,
         Flag,
@@ -20,10 +25,6 @@ enum MineStatus
         Empty
     };
 
-class MyMine
-{
-    
-public:
     MineStatus m_status;
     UINT m_width;
     UINT m_height;
